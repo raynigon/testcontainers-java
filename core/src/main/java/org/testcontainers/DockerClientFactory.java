@@ -148,7 +148,12 @@ public class DockerClientFactory {
 
         String hostIpAddress = strategy.getDockerHostIpAddress();
         log.info("Docker host IP address is {}", hostIpAddress);
-        final DockerClient client = strategy.getClient();
+        final DockerClient client = new DelegatingDockerClient(strategy.getClient()) {
+            @Override
+            public void close() {
+                throw new IllegalStateException("You should never close the global DockerClient!");
+            }
+        };
 
         Info dockerInfo = client.infoCmd().exec();
         Version version = client.versionCmd().exec();
@@ -234,7 +239,7 @@ public class DockerClientFactory {
 
     private void check(String message, boolean isSuccessful) {
         if (isSuccessful) {
-            log.info("\u2714︎ {}", message);
+            log.info("\u2714\ufe0e {}", message);
         } else {
             log.error("\u274c {}", message);
             throw new IllegalStateException("Check failed: " + message);
