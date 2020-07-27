@@ -25,7 +25,6 @@ This can be useful for software that has a command line administration tool. You
 ## Environment variables
 
 To add environment variables to the container, use `withEnv`:
-```java
-new GenericContainer(...)
-		.withEnv("API_TOKEN", "foo")
-```
+<!--codeinclude-->
+[Environment Variables](../../modules/elasticsearch/src/test/java/org/testcontainers/elasticsearch/ElasticsearchContainerTest.java) inside_block:containerWithEnvironment
+<!--/codeinclude-->
