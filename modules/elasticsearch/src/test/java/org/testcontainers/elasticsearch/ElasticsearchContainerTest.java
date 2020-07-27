@@ -1,13 +1,5 @@
 package org.testcontainers.elasticsearch;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.rnorth.visibleassertions.VisibleAssertions.assertThrows;
-import static org.testcontainers.elasticsearch.ElasticsearchContainer.ELASTICSEARCH_DEFAULT_VERSION;
-
-import java.io.IOException;
-
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -26,6 +18,15 @@ import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.After;
 import org.junit.Test;
+import org.testcontainers.utility.DockerImageName;
+
+import java.io.IOException;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.rnorth.visibleassertions.VisibleAssertions.assertThrows;
+import static org.testcontainers.elasticsearch.ElasticsearchContainer.ELASTICSEARCH_DEFAULT_VERSION;
 
 public class ElasticsearchContainerTest {
 
@@ -33,6 +34,10 @@ public class ElasticsearchContainerTest {
      * Elasticsearch version which should be used for the Tests
      */
     private static final String ELASTICSEARCH_VERSION = Version.CURRENT.toString();
+    private static final DockerImageName ELASTICSEARCH_IMAGE =
+        DockerImageName
+            .parse("docker.elastic.co/elasticsearch/elasticsearch")
+            .withTag(ELASTICSEARCH_VERSION);
 
     /**
      * Elasticsearch default username, when secured with a license > basic
@@ -54,6 +59,7 @@ public class ElasticsearchContainerTest {
         }
     }
 
+    @SuppressWarnings("deprecation") // Using deprecated constructor for verification of backwards compatibility
     @Test
     public void elasticsearchDefaultTest() throws IOException {
         // Create the elasticsearch container.
@@ -82,7 +88,7 @@ public class ElasticsearchContainerTest {
 
     @Test
     public void elasticsearchVersion() throws IOException {
-        try (ElasticsearchContainer container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:" + ELASTICSEARCH_VERSION)) {
+        try (ElasticsearchContainer container = new ElasticsearchContainer(ELASTICSEARCH_IMAGE)) {
             container.start();
             Response response = getClient(container).performRequest(new Request("GET", "/"));
             assertThat(response.getStatusLine().getStatusCode(), is(200));
@@ -93,10 +99,14 @@ public class ElasticsearchContainerTest {
 
     @Test
     public void elasticsearchOssImage() throws IOException {
-        try (
-            // oosContainer {
-            ElasticsearchContainer container = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:" + ELASTICSEARCH_VERSION)
-            // }
+        try (ElasticsearchContainer container =
+                 // oosContainer {
+                 new ElasticsearchContainer(
+                     DockerImageName
+                         .parse("docker.elastic.co/elasticsearch/elasticsearch-oss")
+                         .withTag(ELASTICSEARCH_VERSION)
+                 )
+             // }
         ) {
             container.start();
             Response response = getClient(container).performRequest(new Request("GET", "/"));
@@ -108,6 +118,7 @@ public class ElasticsearchContainerTest {
         }
     }
 
+    @SuppressWarnings("deprecation") // Using deprecated constructor for verification of backwards compatibility
     @Test
     public void restClientClusterHealth() throws IOException {
         // httpClientContainer {
@@ -138,7 +149,11 @@ public class ElasticsearchContainerTest {
     public void transportClientClusterHealth() {
         // transportClientContainer {
         // Create the elasticsearch container.
-        try (ElasticsearchContainer container = new ElasticsearchContainer()) {
+        try (ElasticsearchContainer container = new ElasticsearchContainer(
+            DockerImageName
+                .parse("docker.elastic.co/elasticsearch/elasticsearch")
+                .withTag("6.4.1")
+        )){
             // Start the container. This step might take some time...
             container.start();
 
