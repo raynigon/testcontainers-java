@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
+
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ContainerCreationTest {
@@ -39,5 +42,17 @@ public class ContainerCreationTest {
     public void testStartup() {
         assertTrue(redis.isRunning()); // good enough to check that the container started listening
         assertTrue(alpine.isRunning()); // good enough to check that the container started listening
+    }
+
+    @Test
+    public void createContainer() {
+        try (
+            GenericContainer container =
+                // simplestContainer {
+                new GenericContainer(DockerImageName.parse("jboss/wildfly:9.0.1.Final"))
+                // }
+        ) {
+            assertNotNull(container);
+        }
     }
 }

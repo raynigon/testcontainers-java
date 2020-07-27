@@ -11,9 +11,9 @@ images as temporary test dependencies. For example, if you might use it to test 
 * Other services developed by your team/organization which are already dockerized
 
 With a generic container, you set the container image using a parameter to the rule constructor, e.g.:
-```java
-new GenericContainer(DockerImageName.parse("jboss/wildfly:9.0.1.Final"))
-```
+<!--codeinclude--> 
+[Creating a container (JUnit 4)](../examples/junit4/generic/src/test/java/generic/ContainerCreationTest.java) inside_block:simplestContainer
+<!--/codeinclude-->
 
 ### Specifying an image
 
